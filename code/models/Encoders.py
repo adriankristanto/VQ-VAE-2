@@ -80,3 +80,15 @@ class TopEncoder(nn.Module):
     def forward(self, x):
         x = self.layers(x)
         return x
+    
+
+if __name__ == "__main__":
+    topencoder = TopEncoder(128, 128, 2, 32)
+    bottomencoder = BottomEncoder(3, 128, 2, 32)
+    input_image = torch.randn((1, 3, 256, 256))
+
+    x = bottomencoder(input_image)
+    print(x.shape)
+
+    x = topencoder(x)
+    print(x.shape)
