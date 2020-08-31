@@ -32,3 +32,22 @@ if 'reconstructed_images' not in os.listdir(MAIN_DIR):
 if 'saved_models' not in os.listdir(MAIN_DIR):
     print('creating saved_models directory...', flush=True)
     os.mkdir(MAIN_DIR + 'saved_models')
+
+# 1. load the data
+ROOT_DIR = os.path.dirname(os.path.realpath(__file__)) + '/../data/'
+BATCH_SIZE = 128
+
+train_transform = transforms.Compose([
+    # the dataset to be used will be the FFHQ dataset of size (1024, 1024)
+    # since this is a 2-level VQVAE2, we need to reshape the input image to shape (256, 256)
+    transforms.Resize((256, 256)),
+    transforms.ToTensor(),
+    transforms.Normalize((0.5, 0.5, 0.5), (0.5, 0.5, 0.5))
+])
+
+trainset = datasets.ImageFolder(root=ROOT_DIR, transform=train_transform)
+trainloader = torch.utils.data.DataLoader(trainset, batch_size=BATCH_SIZE, shuffle=True)
+
+print(f"""
+Total data: {len(trainset)}
+""", flush=True)
