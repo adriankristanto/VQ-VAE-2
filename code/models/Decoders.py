@@ -9,7 +9,10 @@ from Residual import ResidualBlock
 class BottomDecoder(nn.Module):
 
     """
-    
+    Similar to the bottom encoder, the bottom decoder has the same architecture as 
+    the decoder used in VQ-VAE-1.
+    It will upsample the input by a factor of 4.
+    For example, given an input of shape (64, 64, hidden_channels) => (256, 256, 3)
     """
 
     def __init__(self, in_channels, hidden_channels, num_resblocks, res_channels, out_channels):
@@ -40,3 +43,7 @@ class BottomDecoder(nn.Module):
             # p = (2(in - 1) + 4 - 2in) / 2 = 1
             nn.ConvTranspose2d(in_channels=hidden_channels//2, out_channels=out_channels, kernel_size=4, stride=2, padding=1)
         ]
+
+    def forward(self, x):
+        x = self.layers(x)
+        return x
