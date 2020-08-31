@@ -55,6 +55,7 @@ class VQVAE2(nn.Module):
         # next, the concatenated tensors will be passed on to the bottom vq layer
         bottom_encoded = self.bottom_pre_vq(bottom_encoded)
         bottom_quantized, bottom_loss, _, _, bottom_ids, _ = self.bottom_vectorquantizer(bottom_encoded)
+        # the ids are required to train the PixelCNN model, which is the PixelSNAIL
         return top_quantized, bottom_quantized, top_loss + bottom_loss, top_ids, bottom_ids
     
     def decode(self, top_quantized, bottom_quantized):
@@ -68,3 +69,8 @@ class VQVAE2(nn.Module):
         # decode the concatenated tensors
         bottom_decoded = self.bottom_decoder(bottom_quantized)
         return bottom_decoded
+
+    def forward(self, x):
+        top_quantized, bottom_quantized, commitment_loss, _, _ = self.encode(x)
+        x = self.decode(top_quantized, bottom_quantized)
+        return x, commitment_loss
