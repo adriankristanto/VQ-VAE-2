@@ -17,6 +17,9 @@ print(f"Current device: {device}\n", flush=True)
 
 # directory setup
 MAIN_DIR = os.path.dirname(os.path.realpath(__file__)) + '/../'
+if 'data' not in os.listdir(MAIN_DIR):
+    print('creating data directory...', flush=True)
+    os.mkdir(MAIN_DIR + 'data')
 if 'generated_images' not in os.listdir(MAIN_DIR):
     print('creating generated_images directory...', flush=True)
     os.mkdir(MAIN_DIR + 'generated_images')
