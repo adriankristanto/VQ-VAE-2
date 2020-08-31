@@ -109,7 +109,6 @@ class VectorQuantizerEMA(nn.Module):
         quantized = self.quantize(nearest_embedding_ids).view(*x.shape)
         # print(quantized.shape) # torch.Size([16, 32, 32, 64])
 
-        # TODO: one hot to device?
         # create one-hot encoding where each row represents an array of size 512
         # the encoding will be used for EMA calculation
         encodings = F.one_hot(nearest_embedding_ids, num_classes=self.K).type(x_flatten.dtype)
