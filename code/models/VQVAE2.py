@@ -37,3 +37,22 @@ class VQVAE2(nn.Module):
         # output: input image channel, in_channels
         self.top_decoder = TopDecoder(D, hidden_channels, num_resblocks, res_channels, D)
         self.bottom_decoder = BottomDecoder(D + D, hidden_channels, num_resblocks, res_channels, in_channels)
+    
+    def encode(self, x):
+        # according to the paper,
+        # the bottom encoder accepts the input image
+        bottom_encoded = self.bottom_encoder(x)
+        # the top encoder accepts the output of the bottom encoder
+        top_encoded = self.top_encoder(bottom_encoded)
+        # the output of the top encoder will then get passed on to the top vq layer
+        top_encoded = self.top_pre_vq(top_encoded)
+        top_quantized, top_loss, _, _, top_ids, _ = self.top_vectorquantizer(top_encoded)
+        # next, top_quantized will be passed on to the top decoder
+        top_decoded = self.top_decoder(top_quantized)
+        # the output of the top decoder will then be concatenated with the output of the bottom encoder
+        # on the dimension of the number of channels
+        bottom_encoded = torch.cat([top_decoded, bottom_encoded], dim=1)
+        # next, the concatenated tensors will be passed on to the bottom vq layer
+        bottom_encoded = self.bottom_pre_vq(bottom_encoded)
+        bottom_quantized, bottom_loss, _, _, bottom_ids, _ = self.bottom_vectorquantizer(bottom_encoded)
+        return top_quantized, bottom_quantized, top_loss + bottom_loss, top_ids, bottom_ids
