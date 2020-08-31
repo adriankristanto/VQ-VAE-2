@@ -51,3 +51,25 @@ trainloader = torch.utils.data.DataLoader(trainset, batch_size=BATCH_SIZE, shuff
 print(f"""
 Total data: {len(trainset)}
 """, flush=True)
+
+# 2. instantiate the model
+net = VQVAE2(
+    in_channels=3,
+    hidden_channels=128,
+    num_resblocks=2,
+    res_channels=32,
+    D=64,
+    K=512,
+    beta=0.25,
+    gamma=0.99
+)
+
+print(f"{net}\n", flush=True)
+
+multigpu = False
+if torch.cuda.device_count() > 1:
+    print(f'Number of GPUs: {torch.cuda.device_count()}\n', flush=True)
+    net = nn.DataParallel(net)
+    multigpu = True
+
+net.to(device)
