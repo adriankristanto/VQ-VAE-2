@@ -24,7 +24,10 @@ class VQVAE2(nn.Module):
         # output: D, to make sure that the number of channels equals to D (embedding dimension)
         self.bottom_pre_vq = nn.Conv2d(in_channels=hidden_channels+D, out_channels=D, kernel_size=1, stride=1)
         ################ quantizer
-        self.vectorquantizer = VectorQuantizerEMA(D, K, beta, gamma)
+        # since the weights of the top and bottom quantizer will be different, make sure to create 2
+        # vector quantizer layers
+        self.top_vectorquantizer = VectorQuantizerEMA(D, K, beta, gamma)
+        self.bottom_vectorquantizer = VectorQuantizerEMA(D, K, beta, gamma)
         ################ post-quantizer
         # input: top quantized, D
         # output: D
