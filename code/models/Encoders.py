@@ -44,3 +44,39 @@ class BottomEncoder(nn.Module):
     def forward(self, x):
         x = self.layers(x)
         return x
+
+class TopEncoder(nn.Module):
+
+    """
+    The top encoder will take the output of the bottom encoder and downsample it further
+    by a factor of 2.
+    For example, given an input of shape (64, 64, bottom_hidden_channels) => (32, 32, hidden_channels)
+    """
+
+    def __init__(self, in_channels, hidden_channels, num_resblocks, res_channels):
+        super(TopEncoder, self).__init__()
+        self.layers = self._build(in_channels, hidden_channels, num_resblocks, res_channels)
+    
+    def _build(self, in_channels, hidden_channels, num_resblocks, res_channels):
+        layers = [
+            # padding = (2(n/2 - 1) -n + 4) / 2 = 1
+            nn.Conv2d(in_channels=in_channels, out_channels=hidden_channels // 2, kernel_size=4, stride=2, padding=1),
+            nn.ReLU(),
+            # padding = ((n - 1) -n + 3) / 2 = 1
+            nn.Conv2d(in_channels=hidden_channels // 2, out_channels=hidden_channels, kernel_size=3, stride=1, padding=1)
+        ]
+        layers += [
+            # here, we create num_resblocks number of residual blocks
+            ResidualBlock(hidden_channels, res_channels, hidden_channels) for _ in range(num_resblocks)
+        ]
+        layers += [
+            # each resblock output is not wrapped by the activation function as the next block has ReLU as its first layer
+            # however, the final resblock doesn't have anything to wrap its output with an activation function
+            # therefore, here we wrap the output of the final resblock with ReLU
+            nn.ReLU()
+        ]
+        return nn.Sequential(*layers)
+    
+    def forward(self, x):
+        x = self.layers(x)
+        return x
