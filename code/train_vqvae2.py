@@ -52,6 +52,11 @@ print(f"""
 Total data: {len(trainset)}
 """, flush=True)
 
+# input image sample
+# data_iter = iter(trainset)
+# img = next(data_iter)[0]
+# torchvision.utils.save_image(img, 'sample.png')
+
 # 2. instantiate the model
 net = VQVAE2(
     in_channels=3,
