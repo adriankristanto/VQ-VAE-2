@@ -74,3 +74,17 @@ class VQVAE2(nn.Module):
         top_quantized, bottom_quantized, commitment_loss, _, _ = self.encode(x)
         x = self.decode(top_quantized, bottom_quantized)
         return x, commitment_loss
+
+if __name__ == "__main__":
+    net = VQVAE2(
+        in_channels=3,
+        hidden_channels=128,
+        num_resblocks=2,
+        res_channels=32,
+        D=64,
+        K=512,
+    )
+    print(net)
+
+    x = torch.randn((1, 3, 256, 256))
+    print(net(x)[0].shape)
