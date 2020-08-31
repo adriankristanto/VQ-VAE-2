@@ -73,3 +73,9 @@ if torch.cuda.device_count() > 1:
     multigpu = True
 
 net.to(device)
+
+# 3. define the loss function
+# this is the first loss term, which will be optimized by both the encoder and the decoder
+# the third loss term, which will be optimized by the encoder, will be returned by the vq layer
+# the second loss term will not be used here, as EMA update is used.
+reconstruction_loss = nn.MSELoss()
