@@ -11,7 +11,7 @@ class BottomEncoder(nn.Module):
     """
     The bottom encoder has the same architecture as the encoder from VQ-VAE-1.
     It will downsample the input image by a factor of 4.
-    For example, input image of shape (256, 256, 3) => output image of shape (64, 64, 3).
+    For example, input image of shape (256, 256, 3) => output image of shape (64, 64, hidden_channels).
     """
 
     def __init__(self, in_channels, hidden_channels, num_resblocks, res_channels):
