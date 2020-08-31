@@ -88,7 +88,7 @@ if __name__ == "__main__":
     input_image = torch.randn((1, 3, 256, 256))
 
     x = bottomencoder(input_image)
-    print(x.shape)
+    print(x.shape) # torch.Size([1, 128, 64, 64])
 
     x = topencoder(x)
-    print(x.shape)
+    print(x.shape) # torch.Size([1, 128, 32, 32])
