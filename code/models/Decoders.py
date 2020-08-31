@@ -88,29 +88,20 @@ class TopDecoder(nn.Module):
         return x
 
 if __name__ == "__main__":
-    from Encoders import TopEncoder, BottomEncoder
-
-    topencoder = TopEncoder(128, 128, 2, 32)
-    bottomencoder = BottomEncoder(3, 128, 2, 32)
-    
     topdecoder = TopDecoder(128, 128, 2, 32, 128)
     bottomdecoder = BottomDecoder(128 + 128, 128, 2, 32, 3)
 
-    input_image = torch.randn((1, 3, 256, 256))
+    top_x = torch.randn((1, 128, 32, 32))
+    bottom_x = torch.randn((1, 128, 64, 64))
 
-    # encoding process
-    bottom_x = bottomencoder(input_image)
-    print(f"bottom_x shape: {bottom_x.shape}") # bottom_x shape: torch.Size([1, 128, 64, 64])
-    top_x = topencoder(bottom_x) 
-    print(f"top_x shape: {top_x.shape}") # top_x shape: torch.Size([1, 128, 32, 32])
     top_y = topdecoder(top_x)
     print(f"top_y shape: {top_y.shape}") # top_y shape: torch.Size([1, 128, 64, 64])
     x = torch.cat([top_y, bottom_x], dim=1)
     print(f"concatenate top_y with bottom_x shape: {x.shape}") # concatenate top_y with bottom_x shape: torch.Size([1, 256, 64, 64])
 
     # decoding process
-    upsample_top_y = nn.ConvTranspose2d(in_channels=128, out_channels=128, kernel_size=4, stride=2, padding=1)(top_x)
-    print(f'upsample_top_y shape: {upsample_top_y.shape}')
+    upsample_top_x = nn.ConvTranspose2d(in_channels=128, out_channels=128, kernel_size=4, stride=2, padding=1)(top_x)
+    print(f'upsample_top_x shape: {upsample_top_x.shape}')
     bottom_y = torch.cat([upsample_top_y, bottom_x], dim=1)
     print(f'concatenate top_y with bottom_x shape: {bottom_y.shape}')
     y = bottomdecoder(bottom_y)
