@@ -56,3 +56,15 @@ class VQVAE2(nn.Module):
         bottom_encoded = self.bottom_pre_vq(bottom_encoded)
         bottom_quantized, bottom_loss, _, _, bottom_ids, _ = self.bottom_vectorquantizer(bottom_encoded)
         return top_quantized, bottom_quantized, top_loss + bottom_loss, top_ids, bottom_ids
+    
+    def decode(self, top_quantized, bottom_quantized):
+        # according to the paper, 
+        # the top_quantized is passed on to convtranspose layer for it to be able to be concatenated with
+        # bottom_quantized
+        # make sure that the (h, w) of the top_quantized == (h, w) of the bottom_quantized
+        top_quantized = self.top_post_vq(top_quantized)
+        # concatenate top_quantizeed and bottom_quantized
+        bottom_quantized = torch.cat([top_quantized, bottom_quantized], dim=1)
+        # decode the concatenated tensors
+        bottom_decoded = self.bottom_decoder(bottom_quantized)
+        return bottom_decoded
