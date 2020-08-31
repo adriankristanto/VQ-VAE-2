@@ -43,6 +43,7 @@ class BottomDecoder(nn.Module):
             # p = (2(in - 1) + 4 - 2in) / 2 = 1
             nn.ConvTranspose2d(in_channels=hidden_channels//2, out_channels=out_channels, kernel_size=4, stride=2, padding=1)
         ]
+        return nn.Sequential(*layers)
 
     def forward(self, x):
         x = self.layers(x)
