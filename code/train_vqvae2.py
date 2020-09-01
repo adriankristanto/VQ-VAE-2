@@ -118,3 +118,61 @@ if CONTINUE_TRAIN:
     net.load_state_dict(checkpoint.get('net_state_dict'))
     optimizer.load_state_dict(checkpoint.get('optimizer_state_dict'))
     next_epoch = checkpoint.get('epoch')
+
+# training loop
+for epoch in range(next_epoch, EPOCH):
+    running_loss = 0.0
+
+    sample = None
+    sampling = True
+
+    net.train()
+    for train_data in tqdm(trainloader, desc=f'Epoch {epoch + 1}/{EPOCH}'):
+        inputs = train_data[0].to(device)
+        # 1. zeroes the gradients
+        # optimizer.zero_grad() vs net.zero_grad()
+        # reference: https://discuss.pytorch.org/t/model-zero-grad-or-optimizer-zero-grad/28426
+        net.zero_grad()
+        # 2. forward propagation
+        outputs, commitment_loss = net(inputs)
+        # 3. compute loss
+        # note: the commitment loss has been multiplied by beta in the vq layer
+        if multigpu:
+            # if we are using multiple gpus for training, there will be x number of loss returned as a tensor 
+            # instead of just a scalar
+            # where x is the number of gpus that we used for training
+            # this can cause an issue with the autograd
+            # therefore, we need to make it a scalar by taking the mean
+            commitment_loss = torch.mean(commitment_loss)
+        loss = reconstruction_loss(outputs, inputs) + commitment_loss
+        # 4. backward propagation
+        loss.backward()
+        # 5. update parameters
+        optimizer.step()
+
+        running_loss += loss.item()
+
+        if sampling:
+            sampling = False
+            # take the first RECONSTRUCTION_SIZE images for reconstruction testing
+            sample = inputs[:RECONSTRUCTION_SIZE]
+    
+    # reconstruction test
+    net.eval()
+    with torch.no_grad():
+        outputs, _, _, _ = net(sample)
+        # unnormalise
+        # reference: https://discuss.pytorch.org/t/understanding-transform-normalize/21730
+        sample = sample * 0.5 + 0.5
+        outputs = outputs * 0.5 + 0.5
+        torchvision.utils.save_image(sample, RECONSTRUCTED_DIRPATH + f'vqvae2_real_{epoch+1}.png')
+        torchvision.utils.save_image(outputs, RECONSTRUCTED_DIRPATH + f'vqvae2_reconstructed_{epoch+1}.png')
+    
+    # save the model
+    if (epoch + 1) % SAVE_INTERVAL == 0:
+        save_training_progress(epoch, net, optimizer, MODEL_DIRPATH + f'vqvae2-model-epoch{epoch + 1}.pth')
+    
+    print(f"Training loss: {running_loss / len(trainloader)}", flush=True)
+
+# save the model
+save_training_progress(epoch, net, optimizer, MODEL_DIRPATH + f'vqvae2-model-epoch{epoch + 1}.pth')
