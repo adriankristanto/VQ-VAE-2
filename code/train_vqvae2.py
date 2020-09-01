@@ -111,3 +111,10 @@ def save_training_progress(epoch, net, optimizer, filename):
         'net_state_dict' : net.state_dict(),
         'optimizer_state_dict' : optimizer.state_dict(),
     }, filename)
+
+next_epoch = 0
+if CONTINUE_TRAIN:
+    checkpoint = torch.load(CONTINUE_TRAIN_NAME)
+    net.load_state_dict(checkpoint.get('net_state_dict'))
+    optimizer.load_state_dict(checkpoint.get('optimizer_state_dict'))
+    next_epoch = checkpoint.get('epoch')
