@@ -100,7 +100,7 @@ CONTINUE_TRAIN_NAME = MODEL_DIRPATH + 'vqvae2-model-epoch10.pth'
 # 70000 // 128 + 1 = 547 updates per epoch
 # 304741 // 547 + 1 = 558 epochs -> round up to 560
 EPOCH = 560
-SAVE_INTERVAL = 5
+SAVE_INTERVAL = 10
 # for reconstruction test
 RECONSTRUCTION_SIZE = 64
 
