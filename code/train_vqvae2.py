@@ -103,3 +103,11 @@ EPOCH = 560
 SAVE_INTERVAL = 5
 # for reconstruction test
 RECONSTRUCTION_SIZE = 64
+
+def save_training_progress(epoch, net, optimizer, filename):
+    torch.save({
+        # since the currect epoch has been completed, save the next epoch
+        'epoch' : epoch + 1,
+        'net_state_dict' : net.state_dict(),
+        'optimizer_state_dict' : optimizer.state_dict(),
+    }, filename)
