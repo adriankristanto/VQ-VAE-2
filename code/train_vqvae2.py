@@ -160,7 +160,7 @@ for epoch in range(next_epoch, EPOCH):
     # reconstruction test
     net.eval()
     with torch.no_grad():
-        outputs, _, _, _ = net(sample)
+        outputs, _ = net(sample)
         # unnormalise
         # reference: https://discuss.pytorch.org/t/understanding-transform-normalize/21730
         sample = sample * 0.5 + 0.5
