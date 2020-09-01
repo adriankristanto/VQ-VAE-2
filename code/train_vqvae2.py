@@ -89,3 +89,17 @@ reconstruction_loss = nn.MSELoss()
 # the learning rate used in the original implementation by the author
 LEARNING_RATE = 3e-4
 optimizer = optim.Adam(net.parameters(), lr=LEARNING_RATE)
+
+# 5. train the model
+MODEL_DIRPATH = os.path.dirname(os.path.realpath(__file__)) + '/../saved_models/'
+RECONSTRUCTED_DIRPATH = os.path.dirname(os.path.realpath(__file__)) + '/../reconstructed_images/'
+CONTINUE_TRAIN = False
+CONTINUE_TRAIN_NAME = MODEL_DIRPATH + 'vqvae2-model-epoch10.pth'
+# in the paper, the authors did 304741 updates with 70000 images from the ffhq dataset
+# since they were using 128 as the batch size, 
+# 70000 // 128 + 1 = 547 updates per epoch
+# 304741 // 547 + 1 = 558 epochs -> round up to 560
+EPOCH = 560
+SAVE_INTERVAL = 5
+# for reconstruction test
+RECONSTRUCTION_SIZE = 64
