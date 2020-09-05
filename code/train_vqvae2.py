@@ -105,7 +105,7 @@ if __name__ == "__main__":
     EPOCH = 560
     SAVE_INTERVAL = 10
     # for reconstruction test
-    RECONSTRUCTION_SIZE = 64
+    RECONSTRUCTION_SIZE = 20
 
     def save_training_progress(epoch, net, optimizer, filename):
         torch.save({
@@ -126,13 +126,9 @@ if __name__ == "__main__":
     # wrap the trainloader in tqdm
     trainloader = tqdm(trainloader)
     for epoch in range(next_epoch, EPOCH):
-        # running_loss = 0.0
-
-        sample = None
-        sampling = True
 
         net.train()
-        for train_data in trainloader:
+        for i, train_data in enumerate(trainloader):
             inputs = train_data[0].to(device)
             # 1. zeroes the gradients
             # optimizer.zero_grad() vs net.zero_grad()
@@ -165,22 +161,22 @@ if __name__ == "__main__":
                 f"latent: {commitment_loss.item():.5f}; "
                 f"loss: {loss.item():.5f}"
             ))
-
-            if sampling:
-                sampling = False
-                # take the first RECONSTRUCTION_SIZE images for reconstruction testing
+            
+            # every 100 updates, save the reconstructed images
+            if i % 100:
+                net.eval()
                 sample = inputs[:RECONSTRUCTION_SIZE]
-        
-        # reconstruction test
-        net.eval()
-        with torch.no_grad():
-            outputs, _ = net(sample)
-            # unnormalise
-            # reference: https://discuss.pytorch.org/t/understanding-transform-normalize/21730
-            sample = sample * 0.5 + 0.5
-            outputs = outputs * 0.5 + 0.5
-            torchvision.utils.save_image(sample, RECONSTRUCTED_DIRPATH + f'vqvae2_real_{epoch+1}.png')
-            torchvision.utils.save_image(outputs, RECONSTRUCTED_DIRPATH + f'vqvae2_reconstructed_{epoch+1}.png')
+                with torch.no_grad():
+                    outputs, _ = net(sample)
+                torchvision.utils.save_image(
+                    # concatenate the sample and the reconstructed images
+                    # so that we are not saving too many images
+                    torch.cat([sample, outputs], dim=0),
+                    RECONSTRUCTED_DIRPATH + f"vqvae2_{epoch+1}_{i}.png",
+                    nrow=RECONSTRUCTION_SIZE,
+                    normalize=True,
+                    range=(-1, 1)
+                )
         
         # save the model
         if (epoch + 1) % SAVE_INTERVAL == 0:
