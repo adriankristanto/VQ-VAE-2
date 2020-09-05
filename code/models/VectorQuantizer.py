@@ -52,7 +52,9 @@ class VectorQuantizerEMA(nn.Module):
 
         # create the embedding layer's weights
         # initialise the weights using randn
-        embedding_init = torch.randn(D, K)
+        # reference: https://stackoverflow.com/questions/44328530/how-to-get-a-uniform-distribution-in-a-range-r1-r2-in-pytorch
+        # where r1 = 1./K and r2 = -1./K
+        embedding_init = (1./K + 1./K) * torch.rand(D, K) - 1./K # torch.randn(D, K)
         # why use register_buffer? because we want to save the embedding weights, etc. into saved state
         # for training continuation
         # why not use nn.Embedding or register_parameter? here, we update the weights using EMA instead of the traditional update
