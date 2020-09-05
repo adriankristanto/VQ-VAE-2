@@ -101,17 +101,26 @@ class VectorQuantizerEMA(nn.Module):
         nearest_embedding_ids = torch.argmin(distance, dim=1)
         # print(nearest_embedding.shape) # torch.Size([16384])
 
-        # get the nearest embedding vector from the nearest embedding indices that we obtained above
-        # for all 16384 indices, we get the corresponding vector from the look up operation,
-        # therefore, we get 16384 vectors of size 64, i.e. (16384, 64)
-        # then, we unflatten it to make the shape of the output == the shape of the input
-        quantized = self.quantize(nearest_embedding_ids).view(*x.shape)
-        # print(quantized.shape) # torch.Size([16, 32, 32, 64])
-
         # create one-hot encoding where each row represents an array of size 512
         # the encoding will be used for EMA calculation
         encodings = F.one_hot(nearest_embedding_ids, num_classes=self.K).type(x_flatten.dtype)
         # print(encodings.shape) # torch.Size([16384, 512])
+
+        # nearest_embedding_ids will be returned as the latent code
+        # therefore, it should have shape of batch_size x latent_height x latent_width
+        # for example, in VQ-VAE 1, nearest_embedding_ids would have the shape (batch_size, 32, 32)
+        # if we use the author's configuration.
+        # note that the fourth dimension should be 1, because this is just the indices
+        # when we do the embedding, each index will be mapped to a vector of size D
+        # therefore, the shape would be (batch_size, 32, 32, D) following the above example
+        nearest_embedding_ids = nearest_embedding_ids.view(*x.shape[:-1])
+
+        # get the nearest embedding vector from the nearest embedding indices that we obtained above
+        # for all 16384 indices, we get the corresponding vector from the look up operation,
+        # therefore, we get 16384 vectors of size 64, i.e. (16384, 64)
+        # then, we unflatten it to make the shape of the output == the shape of the input
+        quantized = self.quantize(nearest_embedding_ids)
+        # print(quantized.shape) # torch.Size([16, 32, 32, 64])
 
         # if currently training, update the weights via EMA calculation
         # according to the paper, there are 3 items that we need to update
@@ -176,7 +185,7 @@ class VectorQuantizerEMA(nn.Module):
             encodings, 
             # reshaped following the original implementation
             # e.g. from 16384 to (16, 32, 32)
-            nearest_embedding_ids.view(*x.shape[:-1]), 
+            nearest_embedding_ids, 
             distance
         )
 
