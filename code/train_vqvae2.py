@@ -36,6 +36,7 @@ if 'saved_models' not in os.listdir(MAIN_DIR):
 # 1. load the data
 ROOT_DIR = os.path.dirname(os.path.realpath(__file__)) + '/../data/'
 BATCH_SIZE = 128
+NUM_WORKERS = 0
 
 train_transform = transforms.Compose([
     # the dataset to be used will be the FFHQ dataset of size (1024, 1024)
@@ -46,7 +47,7 @@ train_transform = transforms.Compose([
 ])
 
 trainset = datasets.ImageFolder(root=ROOT_DIR, transform=train_transform)
-trainloader = torch.utils.data.DataLoader(trainset, batch_size=BATCH_SIZE, shuffle=True)
+trainloader = torch.utils.data.DataLoader(trainset, batch_size=BATCH_SIZE, shuffle=True, num_workers=NUM_WORKERS)
 
 print(f"""
 Total data: {len(trainset)}
