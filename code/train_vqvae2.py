@@ -120,6 +120,8 @@ if CONTINUE_TRAIN:
     next_epoch = checkpoint.get('epoch')
 
 # training loop
+# wrap the trainloader in tqdm
+trainloader = tqdm(trainloader)
 for epoch in range(next_epoch, EPOCH):
     running_loss = 0.0
 
@@ -127,7 +129,7 @@ for epoch in range(next_epoch, EPOCH):
     sampling = True
 
     net.train()
-    for train_data in tqdm(trainloader, desc=f'Epoch {epoch + 1}/{EPOCH}'):
+    for train_data in trainloader:
         inputs = train_data[0].to(device)
         # 1. zeroes the gradients
         # optimizer.zero_grad() vs net.zero_grad()
@@ -144,13 +146,22 @@ for epoch in range(next_epoch, EPOCH):
             # this can cause an issue with the autograd
             # therefore, we need to make it a scalar by taking the mean
             commitment_loss = torch.mean(commitment_loss)
-        loss = reconstruction_loss(outputs, inputs) + commitment_loss
+        mse = reconstruction_loss(outputs, inputs)
+        loss = mse + commitment_loss
         # 4. backward propagation
         loss.backward()
         # 5. update parameters
         optimizer.step()
 
         running_loss += loss.item()
+
+        # add description to the wrapped trainloader
+        trainloader.set_description((
+            f"epoch: {epoch+1}/{EPOCH}; "
+            f"mse: {mse.item():.5f}; "
+            f"latent: {commitment_loss.item():.5f}; "
+            f"loss: {loss.item():.5f}"
+        ))
 
         if sampling:
             sampling = False
