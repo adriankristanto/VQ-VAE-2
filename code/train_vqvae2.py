@@ -65,7 +65,7 @@ if __name__ == "__main__":
         in_channels=3,
         hidden_channels=128,
         num_resblocks=2,
-        res_channels=64,
+        res_channels=32,
         D=64,
         K=512,
         beta=0.25,
