@@ -157,6 +157,7 @@ class VectorQuantizerEMA(nn.Module):
             
             # self.embed_avg = self.embed_avg * self.gamma + (1 - self.gamma) * torch.matmul(x_flatten.transpose(0, 1), encodings)
             # inplace operation to save memory
+            # NOTE: .data is important to prevent a backprop problem
             self.embed_avg.data.mul_(self.gamma).add_(
                 torch.matmul(x_flatten.transpose(0, 1), encodings), alpha=1 - self.gamma
             )
