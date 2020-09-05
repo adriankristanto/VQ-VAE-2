@@ -168,8 +168,9 @@ class VectorQuantizerEMA(nn.Module):
                 (self.cluster_size + self.epsilon) / (n + self.K * self.epsilon) * n
             )
             
-            # final update: the weights of the embedding layers
-            self.embedding = self.embed_avg / cluster_size
+            # final update: the weights of the embedding layer
+            embedding_normalised = self.embed_avg / cluster_size
+            self.embedding.copy_(embedding_normalised)
             # print(self.embed_avg.shape) # torch.Size([64, 512])
             # print(cluster_size.shape) # torch.Size([512])
 
