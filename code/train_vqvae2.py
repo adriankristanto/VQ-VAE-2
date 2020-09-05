@@ -127,8 +127,8 @@ if __name__ == "__main__":
     trainloader = tqdm(trainloader)
     for epoch in range(next_epoch, EPOCH):
 
-        net.train()
         for i, train_data in enumerate(trainloader):
+            net.train()
             inputs = train_data[0].to(device)
             # 1. zeroes the gradients
             # optimizer.zero_grad() vs net.zero_grad()
