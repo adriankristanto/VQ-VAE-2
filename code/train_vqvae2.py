@@ -164,7 +164,7 @@ if __name__ == "__main__":
             
             # reference: https://github.com/rosinality/vq-vae-2-pytorch
             # every 100 updates, save the reconstructed images
-            if i % 100:
+            if i % 100 == 0:
                 net.eval()
                 sample = inputs[:RECONSTRUCTION_SIZE]
                 with torch.no_grad():
