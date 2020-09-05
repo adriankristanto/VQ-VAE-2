@@ -162,6 +162,7 @@ if __name__ == "__main__":
                 f"loss: {loss.item():.5f}"
             ))
             
+            # reference: https://github.com/rosinality/vq-vae-2-pytorch
             # every 100 updates, save the reconstructed images
             if i % 100:
                 net.eval()
