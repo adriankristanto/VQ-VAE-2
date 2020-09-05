@@ -25,13 +25,13 @@ class ResidualBlock(nn.Module):
     
     def _build(self, in_channels, res_channels, hidden_channels):
         resblock = nn.Sequential(
-            nn.ReLU(),
+            nn.ReLU(inplace=True),
             # the conv layer should use the same padding, thus,
             # NOTE: in == out == n
             # padding = (s(n - 1) - n + f) / 2
             # ((n - 1) -n + 3) / 2 = 1
             nn.Conv2d(in_channels=in_channels, out_channels=res_channels, kernel_size=(3, 3), stride=1, padding=1),
-            nn.ReLU(),
+            nn.ReLU(inplace=True),
             # padding = (s(out - 1) - n + f) / 2
             # ((n - 1) -n + 1) / 2 = 0
             nn.Conv2d(in_channels=res_channels, out_channels=hidden_channels, kernel_size=(1, 1), stride=1, padding=0)
