@@ -61,7 +61,7 @@ class TopEncoder(nn.Module):
         layers = [
             # padding = (2(n/2 - 1) -n + 4) / 2 = 1
             nn.Conv2d(in_channels=in_channels, out_channels=hidden_channels // 2, kernel_size=4, stride=2, padding=1),
-            nn.ReLU(),
+            nn.ReLU(inplace=True),
             # padding = ((n - 1) -n + 3) / 2 = 1
             nn.Conv2d(in_channels=hidden_channels // 2, out_channels=hidden_channels, kernel_size=3, stride=1, padding=1)
         ]
@@ -73,7 +73,7 @@ class TopEncoder(nn.Module):
             # each resblock output is not wrapped by the activation function as the next block has ReLU as its first layer
             # however, the final resblock doesn't have anything to wrap its output with an activation function
             # therefore, here we wrap the output of the final resblock with ReLU
-            nn.ReLU()
+            nn.ReLU(inplace=True)
         ]
         return nn.Sequential(*layers)
     
