@@ -133,7 +133,13 @@ class VectorQuantizerEMA(nn.Module):
             # NOTE: in the paper, n_i^(t) is the number of input vectors that are quantized into a specific 
             # embedding vector
             # essentially, the following is the number of input vectors represented by a specific embedding vector
-            self.cluster_size = self.cluster_size * self.gamma + (1 - self.gamma) * torch.sum(encodings, dim=0)
+            
+            # self.cluster_size = self.cluster_size * self.gamma + (1 - self.gamma) * torch.sum(encodings, dim=0)
+            # inplace methods to save memory
+            self.cluster_size.mul_(self.gamma).add_(
+                torch.sum(encodings, dim=0), alpha=1 - self.gamma
+            )
+            
             # print(torch.sum(encodings, dim=0).shape) # torch.Size([512])
             # torch.sum(encodings, dim=0) means how many input vectors correspond to each index out of 512
             # for example, if the second entry is 32, this means that out of 16384 input vectors, 32 of them are
@@ -147,7 +153,12 @@ class VectorQuantizerEMA(nn.Module):
             # however, this has not been normalised yet by the number of input vectors that is represented by the 
             # aforementioned embedding vector
             # essentially, the following is the new, unnormalised value of a specific embedding vector
-            self.embed_avg = self.embed_avg * self.gamma + (1 - self.gamma) * torch.matmul(x_flatten.transpose(0, 1), encodings)
+            
+            # self.embed_avg = self.embed_avg * self.gamma + (1 - self.gamma) * torch.matmul(x_flatten.transpose(0, 1), encodings)
+            # inplace operation to save memory
+            self.embed_avg.mul_(self.gamma).add_(
+                torch.matmul(x_flatten.transpose(0, 1), encodings), alpha=1 - self.gamma
+            )
 
             # according to https://github.com/zalandoresearch/pytorch-vq-vae/blob/master/vq-vae.ipynb
             # the following is the laplace smoothing of the cluster size
