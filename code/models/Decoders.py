@@ -102,7 +102,7 @@ if __name__ == "__main__":
     # decoding process
     upsample_top_x = nn.ConvTranspose2d(in_channels=128, out_channels=128, kernel_size=4, stride=2, padding=1)(top_x)
     print(f'upsample_top_x shape: {upsample_top_x.shape}')
-    bottom_y = torch.cat([upsample_top_y, bottom_x], dim=1)
+    bottom_y = torch.cat([upsample_top_x, bottom_x], dim=1)
     print(f'concatenate top_y with bottom_x shape: {bottom_y.shape}')
     y = bottomdecoder(bottom_y)
     print(f'output shape: {y.shape}')
