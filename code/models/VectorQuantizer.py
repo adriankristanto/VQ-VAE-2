@@ -131,7 +131,7 @@ class VectorQuantizerEMA(nn.Module):
         if self.training:
 
             encodings_sum = torch.sum(encodings, dim=0)
-            embedding_sum = torch.matmul(x_flatten.transpose(0, 1), encodings)
+            embedding_sum = x_flatten.transpose(0, 1) @ encodings
 
             # the first one is N, or the cluster size
             # NOTE: in the paper, n_i^(t) is the number of input vectors that are quantized into a specific 
