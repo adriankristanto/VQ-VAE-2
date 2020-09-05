@@ -89,10 +89,9 @@ class VectorQuantizerEMA(nn.Module):
         # print(x_flatten.shape) # torch.Size([16384, 64])
         # print(self.embedding.shape) # torch.Size([64, 512])
         distance = (
-            torch.sum(x_flatten ** 2, dim=1, keepdim=True) + # shape: torch.Size([16384, 1])
-            torch.sum(self.embedding ** 2, dim=0, keepdim=True) - # shape: torch.Size([1, 512])
-            # torch.Size([16384, 1]) + torch.Size([1, 512]), using python broadcasting: torch.Size([16384, 512]) + torch.Size([16384, 512])
-            2 * torch.matmul(x_flatten, self.embedding) # shape: torch.Size([16384, 512])
+            torch.sum(x_flatten ** 2, dim=1, keepdim=True) - # shape: torch.Size([16384, 1])
+            2 * torch.matmul(x_flatten, self.embedding) + # shape: torch.Size([16384, 512])
+            torch.sum(self.embedding ** 2, dim=0, keepdim=True) # shape: torch.Size([1, 512])
         )
         # print(distance.shape) # torch.Size([16384, 512])
         # compute the distance between each of the 16384 input vector and 512 embedding vectors
@@ -186,4 +185,4 @@ if __name__ == "__main__":
     net = VectorQuantizerEMA(D=64, K=512)
     print(net)
     print(net(tensor)[0].shape)
-    print(net(tensor)[4].shape)
+    # print(net(tensor)[4].shape)
