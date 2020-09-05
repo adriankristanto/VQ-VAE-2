@@ -75,7 +75,7 @@ class TopDecoder(nn.Module):
             # each resblock output is not wrapped by the activation function as the next block has ReLU as its first layer
             # however, the final resblock doesn't have anything to wrap its output with an activation function
             # therefore, here we wrap the output of the final resblock with ReLU
-            nn.ReLU()
+            nn.ReLU(inplace=True)
         ]
         layers += [
             # p = (2(in - 1) + 4 - 2in) / 2 = 1
