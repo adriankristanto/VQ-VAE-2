@@ -130,9 +130,6 @@ class VectorQuantizerEMA(nn.Module):
         # gamma * previous_term + (1 - gamma) * the current term
         if self.training:
 
-            encodings_sum = torch.sum(encodings, dim=0)
-            embedding_sum = torch.matmul(x_flatten.transpose(0, 1), encodings)
-
             # the first one is N, or the cluster size
             # NOTE: in the paper, n_i^(t) is the number of input vectors that are quantized into a specific 
             # embedding vector
@@ -141,7 +138,7 @@ class VectorQuantizerEMA(nn.Module):
             # self.cluster_size = self.cluster_size * self.gamma + (1 - self.gamma) * torch.sum(encodings, dim=0)
             # inplace methods to save memory
             self.cluster_size.data.mul_(self.gamma).add_(
-                encodings_sum, alpha=1 - self.gamma
+                torch.sum(encodings, dim=0), alpha=1 - self.gamma
             )
             
             # print(torch.sum(encodings, dim=0).shape) # torch.Size([512])
@@ -161,7 +158,7 @@ class VectorQuantizerEMA(nn.Module):
             # self.embed_avg = self.embed_avg * self.gamma + (1 - self.gamma) * torch.matmul(x_flatten.transpose(0, 1), encodings)
             # inplace operation to save memory
             self.embed_avg.data.mul_(self.gamma).add_(
-                embedding_sum, alpha=1 - self.gamma
+                torch.matmul(x_flatten.transpose(0, 1), encodings), alpha=1 - self.gamma
             )
 
             # according to https://github.com/zalandoresearch/pytorch-vq-vae/blob/master/vq-vae.ipynb
