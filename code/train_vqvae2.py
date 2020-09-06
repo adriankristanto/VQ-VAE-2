@@ -103,7 +103,7 @@ if __name__ == "__main__":
     # 70000 // 128 + 1 = 547 updates per epoch
     # 304741 // 547 + 1 = 558 epochs -> round up to 560
     EPOCH = 20
-    SAVE_INTERVAL = 10
+    SAVE_INTERVAL = 5
     # for reconstruction test
     RECONSTRUCTION_SIZE = 20
 
