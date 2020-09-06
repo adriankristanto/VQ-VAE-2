@@ -127,6 +127,8 @@ if __name__ == "__main__":
     trainloader = tqdm(trainloader)
     for epoch in range(next_epoch, EPOCH):
 
+        running_loss = 0.0
+
         for i, train_data in enumerate(trainloader):
             net.train()
             inputs = train_data[0].to(device)
@@ -152,7 +154,7 @@ if __name__ == "__main__":
             # 5. update parameters
             optimizer.step()
 
-            # running_loss += loss.item()
+            running_loss += loss.item()
 
             # add description to the wrapped trainloader
             trainloader.set_description((
@@ -183,7 +185,7 @@ if __name__ == "__main__":
         if (epoch + 1) % SAVE_INTERVAL == 0:
             save_training_progress(epoch, net, optimizer, MODEL_DIRPATH + f'vqvae2-model-epoch{epoch + 1}.pth')
         
-        # print(f"Training loss: {running_loss / len(trainloader)}", flush=True)
+        print(f"Training loss: {running_loss / len(trainloader)}", flush=True)
 
     # save the model
     save_training_progress(epoch, net, optimizer, MODEL_DIRPATH + f'vqvae2-model-epoch{epoch + 1}.pth')
