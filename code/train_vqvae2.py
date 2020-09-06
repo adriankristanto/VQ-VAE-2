@@ -38,7 +38,7 @@ if __name__ == "__main__":
     # 1. load the data
     ROOT_DIR = os.path.dirname(os.path.realpath(__file__)) + '/../data/'
     BATCH_SIZE = 128
-    NUM_WORKERS = 0
+    NUM_WORKERS = 2
 
     train_transform = transforms.Compose([
         # the dataset to be used will be the FFHQ dataset of size (1024, 1024)
