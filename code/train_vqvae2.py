@@ -102,7 +102,7 @@ if __name__ == "__main__":
     # since they were using 128 as the batch size, 
     # 70000 // 128 + 1 = 547 updates per epoch
     # 304741 // 547 + 1 = 558 epochs -> round up to 560
-    EPOCH = 560
+    EPOCH = 20
     SAVE_INTERVAL = 10
     # for reconstruction test
     RECONSTRUCTION_SIZE = 20
