@@ -88,7 +88,13 @@ class VQVAE2(nn.Module):
         # since pytorch needs the shape to be in the form of (batch_size, c, h, w) and top_quantized shape
         # is in the form of (batch_size, h, w, c), we need to change it
         top_quantized = top_quantized.permute(0, 3, 1, 2).contiguous()
-        # note: contiguous() needs to be called after permute.
+
+        # next, we need to quantize the bottom latent code
+        # Note that using FFHQ, where each image is transformed to (256, 256),
+        # the bottom latent code would be of shape (batch_size, 64, 64, 1) or (batch_size, 64, 64)
+        # once we quantize it, it will be of shape (batch_size, 64, 64, D) where D is the dimension of 
+        # each embedding vector
+        bottom_quantized = self.bottom_vectorquantizer.quantize(bottom_ids)
 
     def forward(self, x):
         top_quantized, bottom_quantized, commitment_loss, _, _ = self.encode(x)
