@@ -69,6 +69,41 @@ class VQVAE2(nn.Module):
         # decode the concatenated tensors
         bottom_decoded = self.bottom_decoder(bottom_quantized)
         return bottom_decoded
+    
+    def decode_latent(self, top_ids, bottom_ids):
+        # note that this function differs from the decode() function above.
+        # this function can be used for the generation part.
+        # it doesn't accept the quantized code.
+        # instead, it accepts the latent code, which corresponds to nearest_embedding_ids in VectorQuantizer.py.
+        # once PixelCNN is implemented to generate the latent code (i.e. nearest_embedding_ids) from each level of VQVAE2,
+        # we can use this function to generate a new image
+        # in the paper, the implementation is shown in Figure 2b
+
+        # firstly, pass the top latent code to the top VQ layer
+        # Note that using FFHQ, where each image is transformed to (256, 256),
+        # the top latent code would be of shape (batch_size, 32, 32, 1) or (batch_size, 32, 32)
+        # once we quantize it, it will be of shape (batch_size, 32, 32, D) where D is the dimension of 
+        # each embedding vector
+        top_quantized = self.top_vectorquantizer.quantize(top_ids)
+        # since pytorch needs the shape to be in the form of (batch_size, c, h, w) and top_quantized shape
+        # is in the form of (batch_size, h, w, c), we need to change it
+        top_quantized = top_quantized.permute(0, 3, 1, 2).contiguous()
+
+        # next, we need to quantize the bottom latent code
+        # Note that using FFHQ, where each image is transformed to (256, 256),
+        # the bottom latent code would be of shape (batch_size, 64, 64, 1) or (batch_size, 64, 64)
+        # once we quantize it, it will be of shape (batch_size, 64, 64, D) where D is the dimension of 
+        # each embedding vector
+        bottom_quantized = self.bottom_vectorquantizer.quantize(bottom_ids)
+        # note that when creating the bottom latent code, we need to condition it on the top latent code
+        # however, when decoding it, we don't need to condition anything on anything
+        # similar to the top_quantized above, we need to change the shape of bottom_quantized
+        bottom_quantized = bottom_quantized.permute(0, 3, 1, 2).contiguous()
+
+        # finally, since we now have both top and bottom quantized, we can simply pass 
+        # them to the decode() function above
+        bottom_decoded = self.decode(top_quantized, bottom_quantized)
+        return bottom_decoded
 
     def forward(self, x):
         top_quantized, bottom_quantized, commitment_loss, _, _ = self.encode(x)
