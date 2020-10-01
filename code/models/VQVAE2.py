@@ -71,11 +71,11 @@ class VQVAE2(nn.Module):
         return bottom_decoded
     
     def decode_latent(self, top_ids, bottom_ids):
-        # note that this function differs from the decode() function above
-        # this function can be used for the generation part
-        # it doesn't accept the quantized code
-        # instead, it accepts the latent code, which corresponds to nearest_embedding_ids in VectorQuantizer.py
-        # once PixelCNN is implemented to generate the latent code (i.e. nearest_embedding_ids)
+        # note that this function differs from the decode() function above.
+        # this function can be used for the generation part.
+        # it doesn't accept the quantized code.
+        # instead, it accepts the latent code, which corresponds to nearest_embedding_ids in VectorQuantizer.py.
+        # once PixelCNN is implemented to generate the latent code (i.e. nearest_embedding_ids),
         # we can use this function to generate a new image
         pass
 
