@@ -78,7 +78,13 @@ class VQVAE2(nn.Module):
         # once PixelCNN is implemented to generate the latent code (i.e. nearest_embedding_ids) from each level of VQVAE2,
         # we can use this function to generate a new image
         # in the paper, the implementation is shown in Figure 2b
-        pass
+
+        # firstly, pass the top latent code to the top VQ layer
+        # Note that using FFHQ, where each image is transformed to (256, 256),
+        # the top latent code would be of shape (batch_size, 32, 32, 1) or (batch_size, 32, 32)
+        # once we quantize it, it will be of shape (batch_size, 32, 32, D) where D is the dimension of 
+        # each embedding vector
+        top_quantized = self.top_vectorquantizer.quantize(top_ids)
 
     def forward(self, x):
         top_quantized, bottom_quantized, commitment_loss, _, _ = self.encode(x)
