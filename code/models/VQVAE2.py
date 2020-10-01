@@ -69,6 +69,9 @@ class VQVAE2(nn.Module):
         # decode the concatenated tensors
         bottom_decoded = self.bottom_decoder(bottom_quantized)
         return bottom_decoded
+    
+    def decode_latent(self, top_ids, bottom_ids):
+        pass
 
     def forward(self, x):
         top_quantized, bottom_quantized, commitment_loss, _, _ = self.encode(x)
