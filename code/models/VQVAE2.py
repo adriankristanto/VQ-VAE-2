@@ -95,6 +95,8 @@ class VQVAE2(nn.Module):
         # once we quantize it, it will be of shape (batch_size, 64, 64, D) where D is the dimension of 
         # each embedding vector
         bottom_quantized = self.bottom_vectorquantizer.quantize(bottom_ids)
+        # note that when creating the bottom latent code, we need to condition it on the top latent code
+        # however, when decoding it, we don't need to condition anything on anything
 
     def forward(self, x):
         top_quantized, bottom_quantized, commitment_loss, _, _ = self.encode(x)
