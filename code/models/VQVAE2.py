@@ -85,6 +85,10 @@ class VQVAE2(nn.Module):
         # once we quantize it, it will be of shape (batch_size, 32, 32, D) where D is the dimension of 
         # each embedding vector
         top_quantized = self.top_vectorquantizer.quantize(top_ids)
+        # since pytorch needs the shape to be in the form of (batch_size, c, h, w) and top_quantized shape
+        # is in the form of (batch_size, h, w, c), we need to change it
+        top_quantized = top_quantized.permute(0, 3, 1, 2).contiguous()
+        # note: contiguous() needs to be called after permute.
 
     def forward(self, x):
         top_quantized, bottom_quantized, commitment_loss, _, _ = self.encode(x)
