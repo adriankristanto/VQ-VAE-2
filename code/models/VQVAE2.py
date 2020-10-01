@@ -77,6 +77,7 @@ class VQVAE2(nn.Module):
         # instead, it accepts the latent code, which corresponds to nearest_embedding_ids in VectorQuantizer.py.
         # once PixelCNN is implemented to generate the latent code (i.e. nearest_embedding_ids) from each level of VQVAE2,
         # we can use this function to generate a new image
+        # in the paper, the implementation is shown in Figure 2b
         pass
 
     def forward(self, x):
