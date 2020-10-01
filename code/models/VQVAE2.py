@@ -100,6 +100,11 @@ class VQVAE2(nn.Module):
         # similar to the top_quantized above, we need to change the shape of bottom_quantized
         bottom_quantized = bottom_quantized.permute(0, 3, 1, 2).contiguous()
 
+        # finally, since we now have both top and bottom quantized, we can simply pass 
+        # them to the decode() function above
+        bottom_decoded = self.decode(top_quantized, bottom_quantized)
+        return bottom_decoded
+
     def forward(self, x):
         top_quantized, bottom_quantized, commitment_loss, _, _ = self.encode(x)
         x = self.decode(top_quantized, bottom_quantized)
