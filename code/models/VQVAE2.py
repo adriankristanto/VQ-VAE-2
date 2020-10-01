@@ -97,6 +97,8 @@ class VQVAE2(nn.Module):
         bottom_quantized = self.bottom_vectorquantizer.quantize(bottom_ids)
         # note that when creating the bottom latent code, we need to condition it on the top latent code
         # however, when decoding it, we don't need to condition anything on anything
+        # similar to the top_quantized above, we need to change the shape of bottom_quantized
+        bottom_quantized = bottom_quantized.permute(0, 3, 1, 2).contiguous()
 
     def forward(self, x):
         top_quantized, bottom_quantized, commitment_loss, _, _ = self.encode(x)
